@@ -1,0 +1,75 @@
+    .ORIG x3000
+    
+    AND R0, R0, #0
+    AND R1, R1, #0
+    AND R2, R2, #0
+    AND R3, R3, #0
+    AND R4, R4, #0
+    AND R5, R5, #0
+    AND R6, R6, #0
+    LD R0, FIRST
+    LD R1, SECOND
+    BR SKIP
+    
+INC ADD R0, R0, #1
+    ADD R1, R0, #1
+    ST R0, FIRST
+    ST R1, SECOND
+    
+SKIP 
+    LD R4, FILTER
+    LDI R2, FIRST
+    AND R5, R2, R4
+    BRz END
+LOOP 
+    LDI R3, SECOND
+    AND R6, R3, R4
+    BRz INC
+    JSR COM
+    BR LOOP
+    
+END HALT
+
+COM ST R0, SAVER0
+    ST R1, SAVER1
+    ST R4, SAVER4
+    ST R5, SAVER5
+    ST R6, SAVER6
+
+    LDI R0, FIRST
+    LDI R1, SECOND
+    LD R2, MASK
+    
+    AND R3, R0, R2
+    AND R4, R1, R2
+
+SUM  NOT R6, R4
+     ADD R6, R6, #1
+     ADD R6, R6, R3
+     BRn STO
+     STI R1, FIRST
+     STI R0, SECOND
+
+STO LD R0, SAVER0
+    LD R1, SAVER1
+    LD R4, SAVER4
+    LD R5, SAVER5
+    LD R6, SAVER6
+    ADD R1, R1, #1
+    ST R1, SECOND
+    
+    RET
+
+SAVER0  .FILL   #0
+SAVER1  .FILL   #0
+SAVER2  .FILL   #0
+SAVER3  .FILL   #0
+SAVER4  .FILL   #0
+SAVER5  .FILL   #0
+SAVER6  .FILL   #0
+MASK    .FILL   x00FF
+FIRST   .FILL   x4004
+SECOND  .FILL   x4005
+FILTER  .FILL   xFF00
+
+    .END
